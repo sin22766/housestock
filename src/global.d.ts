@@ -1,9 +1,9 @@
-/// <reference types="@sveltejs/kit">
+/// <reference types="@sveltejs/kit" />
+/// <reference types="mongoose" />
 
-type Order = {
-    product_id: Number;
-    product_name: String;
-    amount: Number;
-    type: String;
-    created_at: Date;
+declare global {
+    var mongoose: mongoose
+}
+
+export interface global {
 }

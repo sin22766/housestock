@@ -1,32 +1,51 @@
 import type {RequestHandler} from "@sveltejs/kit";
+import dbConnect from "$lib/database/dbConnect";
+import {ProductModel} from '$lib/database/dbModel'
 
-type Product = {
-    _id: Number;
-    name: String;
-    description: String;
-    amount: Number;
-}
+await dbConnect();
 
-let products: Product[] = [{
-    _id: 1,
-    name: "Coke",
-    description: "Coca Cola (Can)",
-    amount: 30
-}, {
-    _id: 2,
-    name: "Sprite",
-    description: "Sprite (Can)",
-    amount: 30
-}, {
-    _id: 3,
-    name: "Water",
-    description: "Drinking Water (Bottle)",
-    amount: 30
-}];
-
-export const get: RequestHandler = () => {
+export const get: RequestHandler = async () => {
+    const products = await ProductModel.find({}); // find all the data in our database
     return {
-        status: 200,
+        status: 201,
         body: JSON.stringify(products)
     };
+}
+
+export const post: RequestHandler = async ({request}) => {
+    const payload: any = await request.json();
+    try {
+        const product = await ProductModel.create({
+            name: payload.name,
+            description: payload.description,
+            amount: payload.amount
+        });
+        return {
+            status: 201,
+            body: JSON.stringify(product)
+        }
+    } catch {
+        return {
+            status: 400
+        }
+    }
+}
+
+export const patch: RequestHandler = async ({request}) => {
+    const payload: any = await request.json();
+    try {
+        const updateAmount = (payload.type === 'Used') ? -payload.amount : payload.amount;
+        const product = await ProductModel.findByIdAndUpdate(payload.product_id, {
+            $inc: {amount: updateAmount}
+        });
+        return {
+            status: 201,
+            body: JSON.stringify(product)
+        }
+    } catch {
+        return {
+            status: 400,
+            error: new Error("Product isn't found")
+        }
+    }
 }

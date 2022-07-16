@@ -7,15 +7,15 @@
         if (res.ok) {
             const products = await res.json();
             return {
-                props: {products}
-            }
+                props: {products},
+            };
         }
 
         const {message} = await res.json();
         return {
-            error: new Error(message)
-        }
-    }
+            error: new Error(message),
+        };
+    };
 </script>
 
 <script lang="ts">
@@ -32,43 +32,54 @@
         Icon,
     } from "sveltestrap";
 
-    let orders: any[] = [];
+    let orderItems: any[] = [];
 
     const addOrder = (form: HTMLFormElement) => {
         const formData = new FormData(form);
         const orderItem: any = JSON.parse(String(formData.get("orderItem")));
         const orderAmount: Number = Number(formData.get("orderAmount"));
-        const searchObject = orders.find((item) => item.product_id === orderItem.id);
+        const searchObject = orderItems.find(
+            (item) => item.product_id === orderItem.id
+        );
 
         if (searchObject) {
             searchObject.amount += orderAmount;
         } else {
-            orders.push({
+            orderItems.push({
                 product_id: orderItem.id,
                 product_name: orderItem.name,
                 amount: orderAmount,
-                type: "Used"
+                type: "Used",
             });
         }
 
-        orders = orders;
+        orderItems = orderItems;
     };
 
     const deleteItem = (id: Number) => {
-        orders = orders.filter((item) => item.product_id !== id);
+        orderItems = orderItems.filter((item) => item.product_id !== id);
     };
 
     const submitOrder = async () => {
         const req = await fetch("/api/order", {
-            method: 'POST',
+            method: "POST",
             headers: {
-                accept: "application/json"
+                accept: "application/json",
             },
-            body: JSON.stringify(orders)
+            body: JSON.stringify(
+                orderItems.map((item) => {
+                    delete item.product_name;
+                    return item;
+                })
+            ),
         });
 
-        orders = [];
-    }
+        if (req.ok) {
+            orderItems = [];
+        } else {
+            alert("Order failed to submit!");
+        }
+    };
 
     const formValidate = (event: Event) => {
         const form: HTMLFormElement = event.target as HTMLFormElement;
@@ -81,7 +92,7 @@
         } else {
             form.classList.add("was-validated");
         }
-    }
+    };
 
     export let products: any[];
 </script>
@@ -106,7 +117,12 @@
                                 required
                         >
                             {#each products as product}
-                                <option value="{JSON.stringify({id:product._id,name:product.name})}">{product.name}</option>
+                                <option
+                                        value={JSON.stringify({
+                                        id: product._id,
+                                        name: product.name,
+                                    })}>{product.name}</option
+                                >
                             {/each}
                         </Input>
                     </FormGroup>
@@ -123,14 +139,20 @@
                     </FormGroup>
                     <FormGroup>
                         <Button color="primary">Add</Button>
-                        <Button type="button" color="warning" class="float-end" on:click={submitOrder}>Submit</Button>
+                        <Button
+                                type="button"
+                                color="warning"
+                                class="float-end"
+                                on:click={submitOrder}>Submit
+                        </Button
+                        >
                     </FormGroup>
                 </Form>
             </Card>
         </Col>
         <Col xs="12" md="6" lg="8">
             <Row>
-                {#each orders as item, i}
+                {#each orderItems as item, i}
                     <Col md="12" lg="6" class="my-2">
                         <Card body>
                             <button

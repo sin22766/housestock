@@ -19,7 +19,7 @@
             name: "Order Type",
         },
         {
-            id: "created_at",
+            id: "createdAt",
             name: "Created Time",
             formatter: (cell: any) =>
                 new Date(cell).toLocaleTimeString("th", {
@@ -32,12 +32,12 @@
 
     const server = {
         url: "/api/order",
-        then: (data: Order[]) =>
-            data.map((item: Order) => [
+        then: (data: any) =>
+            data.map((item: any) => [
                 item.product_name,
                 item.amount,
                 item.type,
-                item.created_at,
+                item.createdAt,
             ]),
     };
 
@@ -56,14 +56,21 @@
 
 <h1>Orders</h1>
 <div class="position-relative">
-    <Grid bind:instance={grid} {columns} {server} sort={true} search={true} />
+    <Grid bind:instance={grid} {columns} {server} sort={true} search={true}/>
     <Button
-        class="position-absolute top-0 end-0"
-        color="primary"
-        on:click={toggle}>Add</Button
+            class="position-absolute top-0 end-0"
+            color="primary"
+            on:click={toggle}>Add
+    </Button
     >
 </div>
 
 <Modal header="Add new product" isOpen={open} {toggle} fullscreen>
-    <iframe class="w-100 vh-100" src="/order" title="Orders Maker" />
+    <iframe class="w-100 vh-100" src="/order" title="Orders Maker"></iframe>
 </Modal>
+
+<style>
+    :global(.gridjs-table) {
+        min-width: 100%;
+    }
+</style>
