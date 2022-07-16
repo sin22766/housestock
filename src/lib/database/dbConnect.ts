@@ -1,6 +1,14 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = 'mongodb+srv://sin22766:SiN_04027_MongoDB@householdmanager.ptcmgr3.mongodb.net/?retryWrites=true&w=majority'
+let MONGODB_URI: string;
+
+if (process.env.NODE_ENV === 'production') {
+    // For production
+    MONGODB_URI = String(process.env.MY_MONGODB_URL);
+} else {
+    // For development
+    MONGODB_URI = import.meta.env.VITE_MY_MONGODB_URL;
+}
 
 if (!MONGODB_URI) {
     throw new Error(
@@ -11,7 +19,7 @@ if (!MONGODB_URI) {
 let cached = global.mongoose;
 
 if (!cached) {
-    cached = global.mongoose = {conn: null, promise: null}
+    cached = global.mongoose = { conn: null, promise: null }
 }
 
 async function dbConnect() {
