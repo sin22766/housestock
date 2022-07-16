@@ -3,9 +3,8 @@ import dbConnect from "$lib/database/dbConnect";
 import {OrderModel} from '$lib/database/dbModel'
 import {Types} from 'mongoose'
 
-await dbConnect();
-
 export const get: RequestHandler = async () => {
+    await dbConnect();
     const orders = await OrderModel.find({}).populate('lists.product'); // find all the data in our database
 
     let result: any[] = [];
@@ -28,6 +27,7 @@ export const get: RequestHandler = async () => {
 }
 
 export const post: RequestHandler = async ({request}) => {
+    await dbConnect();
     const payload: any[] = await request.json();
     const orderList = payload.map(item => {
         item.product = new Types.ObjectId(item.product_id);
