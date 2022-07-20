@@ -29,6 +29,7 @@ export const get: RequestHandler = async () => {
 export const post: RequestHandler = async ({request}) => {
     await dbConnect();
     const payload: any[] = await request.json();
+    let errorItem: string[];
     const orderList = payload.map(item => {
         item.product = new Types.ObjectId(item.product_id);
         delete item.product_id;

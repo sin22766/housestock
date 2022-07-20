@@ -28,48 +28,36 @@
         FormGroup,
         Input,
         Label,
-        Button
+        Button,
     } from "sveltestrap";
-    import OrderCard from "$lib/components/orderCard.svelte"
+    import OrderCard from "$lib/components/orderCard.svelte";
 
-    let orderItems: any[] = [];
+    let restockItems: any[] = [];
 
     const addOrder = (form: HTMLFormElement) => {
         const formData = new FormData(form);
-        const orderItem: any = JSON.parse(String(formData.get("orderItem")));
-        const orderAmount: Number = Number(formData.get("orderAmount"));
-        const searchObject = orderItems.find(
-            (item) => item.product_id === orderItem.id
+        const restockItem: any = JSON.parse(String(formData.get("orderItem")));
+        const restockAmount: Number = Number(formData.get("orderAmount"));
+        const searchObject = restockItems.find(
+            (item) => item.product_id === restockItem.id
         );
 
-        const productAmount: Number = products.find(
-            (item) => item._id === orderItem.id
-        ).amount;
-
-        if (orderAmount <= productAmount) {
-            if (searchObject) {
-                if (searchObject.amount + orderAmount <= productAmount) {
-                    searchObject.amount += orderAmount;
-                } else {
-                    alert(`${orderItem.name} is not enough!`);
-                }
-            } else {
-                orderItems.push({
-                    product_id: orderItem.id,
-                    product_name: orderItem.name,
-                    amount: orderAmount,
-                    type: "Used",
-                });
-            }
+        if (searchObject) {
+            searchObject.amount += restockAmount;
         } else {
-            alert(`${orderItem.name} is not enough!`);
+            restockItems.push({
+                product_id: restockItem.id,
+                product_name: restockItem.name,
+                amount: restockAmount,
+                type: "Added",
+            });
         }
 
-        orderItems = orderItems;
+        restockItems = restockItems;
     };
 
     const deleteItem = (id: string) => {
-        orderItems = orderItems.filter((item) => item.product_id !== id);
+        restockItems = restockItems.filter((item) => item.product_id !== id);
     };
 
     const submitOrder = async () => {
@@ -79,7 +67,7 @@
                 accept: "application/json",
             },
             body: JSON.stringify(
-                orderItems.map((item) => {
+                restockItems.map((item) => {
                     delete item.product_name;
                     return item;
                 })
@@ -87,9 +75,9 @@
         });
 
         if (req.ok) {
-            orderItems = [];
+            restockItems = [];
         } else {
-            alert("Order failed to submit!");
+            alert("Restock orders failed to submit!");
         }
     };
 
@@ -110,15 +98,17 @@
 </script>
 
 <svelte:head>
-    <title>Used orders</title>
+    <title>Restock products</title>
 </svelte:head>
 
 <Container class="mt-lg-5 mt-4">
     <Row>
         <Col xs="12" md="6" lg="4" class="my-2">
             <Card body>
-                <h4>Add used Item Here!</h4>
-                <p class="text-muted">Choose Item you used and enter amount.</p>
+                <h4>Add Restock Item Here!</h4>
+                <p class="text-muted">
+                    Choose Item you Restock and enter amount.
+                </p>
                 <Form novalidate on:submit={formValidate}>
                     <FormGroup>
                         <Label for="orderItem">Item</Label>
@@ -134,7 +124,6 @@
                                         id: product._id,
                                         name: product.name,
                                     })}
-                                        disabled={product.amount <= 0}
                                 >
                                     {product.name}
                                 </option>
@@ -167,7 +156,7 @@
         </Col>
         <Col xs="12" md="6" lg="8">
             <Row>
-                {#each orderItems as item, i}
+                {#each restockItems as item, i}
                     <OrderCard {i} {item} {deleteItem}/>
                 {/each}
             </Row>
