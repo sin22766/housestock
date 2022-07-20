@@ -1,7 +1,9 @@
 import type {RequestHandler} from "@sveltejs/kit";
 import dbConnect from "$lib/database/dbConnect";
 import {OrderModel} from '$lib/database/dbModel'
-import {Types} from 'mongoose'
+import mongoose from 'mongoose';
+
+const {Types} = mongoose;
 
 export const get: RequestHandler = async () => {
     await dbConnect();
