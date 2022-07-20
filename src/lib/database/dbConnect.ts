@@ -4,7 +4,7 @@ let MONGODB_URI: string;
 
 if (process.env.NODE_ENV === 'production') {
     // For production
-    MONGODB_URI = String(process.env.MONGODB_URI);
+    MONGODB_URI = String(process.env.MY_MONGODB_URL);
 } else {
     // For development
     MONGODB_URI = import.meta.env.VITE_MY_MONGODB_URL;
