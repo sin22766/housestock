@@ -3,7 +3,7 @@
 
     export let i: Number;
     export let item: any;
-    export const deleteItem = (id: string) => {
+    export let deleteItem = (id: string) => {
     };
 </script>
 

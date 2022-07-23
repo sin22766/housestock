@@ -34,7 +34,7 @@
         url: "/api/order",
         then: (data: any) =>
             data.map((item: any) => [
-                item.product_name,
+                item.product.name,
                 item.amount,
                 item.type,
                 item.createdAt,

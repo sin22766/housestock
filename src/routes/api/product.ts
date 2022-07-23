@@ -4,7 +4,7 @@ import {ProductModel} from '$lib/database/dbModel'
 
 export const get: RequestHandler = async () => {
     await dbConnect();
-    const products = await ProductModel.find({}); // find all the data in our database
+    const products = await ProductModel.find({}).lean(); // find all the data in our database
     return {
         status: 201,
         body: JSON.stringify(products)

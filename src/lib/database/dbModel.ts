@@ -29,10 +29,25 @@ const OrderSchema = new Schema({
     timestamps: true
 });
 
+const ResultOrderSchema = new Schema({
+    product: {type: Schema.Types.ObjectId, ref: 'Product'},
+    amount: {
+        type: Number
+    },
+    type: {
+        type: String
+    },
+    createdAt: {
+        type: Date
+    }
+});
+
+const ResultOrderModel = mongoose.models.ResultOrderModel || model('ResultOrderModel', ResultOrderSchema);
 const ProductModel = mongoose.models.Product || model('Product', ProductSchema);
 const OrderModel = mongoose.models.Order || model('Order', OrderSchema);
 
 export {
     ProductModel,
-    OrderModel
+    OrderModel,
+    ResultOrderModel
 }

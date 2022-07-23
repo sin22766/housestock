@@ -30,25 +30,28 @@
         Label,
         Button,
     } from "sveltestrap";
+    import Select from "svelte-select";
     import OrderCard from "$lib/components/orderCard.svelte";
 
     let restockItems: any[] = [];
 
-    const addOrder = (form: HTMLFormElement) => {
-        const formData = new FormData(form);
-        const restockItem: any = JSON.parse(String(formData.get("orderItem")));
-        const restockAmount: Number = Number(formData.get("orderAmount"));
+    let selectedOption: any = "";
+    let selectedAmount: Number;
+    let selectedError: boolean = false;
+
+    const addOrder = () => {
+        const restockItem: any = JSON.parse(selectedOption.value);
         const searchObject = restockItems.find(
             (item) => item.product_id === restockItem.id
         );
 
         if (searchObject) {
-            searchObject.amount += restockAmount;
+            searchObject.amount += selectedAmount;
         } else {
             restockItems.push({
                 product_id: restockItem.id,
                 product_name: restockItem.name,
-                amount: restockAmount,
+                amount: selectedAmount,
                 type: "Added",
             });
         }
@@ -61,6 +64,10 @@
     };
 
     const submitOrder = async () => {
+        if (!restockItems.length) {
+            console.error("No item in Order");
+            return;
+        }
         const req = await fetch("/api/order", {
             method: "POST",
             headers: {
@@ -85,16 +92,26 @@
         const form: HTMLFormElement = event.target as HTMLFormElement;
         event.preventDefault();
         event.stopPropagation();
-        if (form.checkValidity()) {
-            addOrder(form);
+        if (form.checkValidity() && selectedOption) {
+            addOrder();
             form.reset();
             form.classList.remove("was-validated");
         } else {
+            if (!selectedOption) {
+                selectedError = true;
+            }
             form.classList.add("was-validated");
         }
     };
 
     export let products: any[];
+
+    const itemOption = products.map((prod) => {
+        return {
+            value: JSON.stringify({id: prod._id, name: prod.name}),
+            label: prod.name,
+        };
+    });
 </script>
 
 <svelte:head>
@@ -112,23 +129,13 @@
                 <Form novalidate on:submit={formValidate}>
                     <FormGroup>
                         <Label for="orderItem">Item</Label>
-                        <Input
-                                type="select"
-                                name="orderItem"
+                        <Select
                                 id="orderItem"
-                                required
-                        >
-                            {#each products as product}
-                                <option
-                                        value={JSON.stringify({
-                                        id: product._id,
-                                        name: product.name,
-                                    })}
-                                >
-                                    {product.name}
-                                </option>
-                            {/each}
-                        </Input>
+                                bind:value={selectedOption}
+                                items={itemOption}
+                                hasError={selectedError}
+                                placeholder="Select Item"
+                        />
                     </FormGroup>
                     <FormGroup>
                         <Label for="orderAmount">Amount</Label>

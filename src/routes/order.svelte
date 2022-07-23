@@ -28,16 +28,20 @@
         FormGroup,
         Input,
         Label,
-        Button
+        Button,
     } from "sveltestrap";
-    import OrderCard from "$lib/components/orderCard.svelte"
+    import Select from "svelte-select";
+    import OrderCard from "$lib/components/orderCard.svelte";
 
     let orderItems: any[] = [];
 
-    const addOrder = (form: HTMLFormElement) => {
-        const formData = new FormData(form);
-        const orderItem: any = JSON.parse(String(formData.get("orderItem")));
-        const orderAmount: Number = Number(formData.get("orderAmount"));
+    let selectedOption: any = "";
+    let selectedAmount: Number;
+    let selectedError: boolean = false;
+
+    const addOrder = () => {
+        const orderItem: any = JSON.parse(selectedOption.value);
+        const orderAmount: Number = selectedAmount;
         const searchObject = orderItems.find(
             (item) => item.product_id === orderItem.id
         );
@@ -73,6 +77,10 @@
     };
 
     const submitOrder = async () => {
+        if (!orderItems.length) {
+            console.error("No item in Order");
+            return;
+        }
         const req = await fetch("/api/order", {
             method: "POST",
             headers: {
@@ -97,16 +105,27 @@
         const form: HTMLFormElement = event.target as HTMLFormElement;
         event.preventDefault();
         event.stopPropagation();
-        if (form.checkValidity()) {
-            addOrder(form);
+        if (form.checkValidity() && selectedOption) {
+            addOrder();
+            selectedError = false;
             form.reset();
             form.classList.remove("was-validated");
         } else {
+            if (!selectedOption) {
+                selectedError = true;
+            }
             form.classList.add("was-validated");
         }
     };
 
     export let products: any[];
+
+    const itemOption = products.map((prod) => {
+        return {
+            value: JSON.stringify({id: prod._id, name: prod.name}),
+            label: prod.name,
+        };
+    });
 </script>
 
 <svelte:head>
@@ -122,33 +141,22 @@
                 <Form novalidate on:submit={formValidate}>
                     <FormGroup>
                         <Label for="orderItem">Item</Label>
-                        <Input
-                                type="select"
-                                name="orderItem"
+                        <Select
                                 id="orderItem"
-                                required
-                        >
-                            {#each products as product}
-                                <option
-                                        value={JSON.stringify({
-                                        id: product._id,
-                                        name: product.name,
-                                    })}
-                                        disabled={product.amount <= 0}
-                                >
-                                    {product.name}
-                                </option>
-                            {/each}
-                        </Input>
+                                bind:value={selectedOption}
+                                items={itemOption}
+                                hasError={selectedError}
+                                placeholder="Select Item"
+                        />
                     </FormGroup>
                     <FormGroup>
                         <Label for="orderAmount">Amount</Label>
                         <Input
                                 type="number"
-                                name="orderAmount"
                                 id="orderAmount"
                                 placeholder="0"
                                 min="1"
+                                bind:value={selectedAmount}
                                 required
                         />
                     </FormGroup>
