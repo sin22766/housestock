@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const {Schema, model} = mongoose;
+const { Schema, model } = mongoose;
 
 const ProductSchema = new Schema({
     name: {
@@ -16,7 +16,10 @@ const ProductSchema = new Schema({
 const OrderSchema = new Schema({
     lists: {
         type: [{
-            product: {type: Schema.Types.ObjectId, ref: 'Product'},
+            product: { type: Schema.Types.ObjectId, ref: 'Product' },
+            product_name: {
+                type: String
+            },
             amount: {
                 type: Number
             },
@@ -30,7 +33,7 @@ const OrderSchema = new Schema({
 });
 
 const ResultOrderSchema = new Schema({
-    product: {type: Schema.Types.ObjectId, ref: 'Product'},
+    product: { type: Schema.Types.ObjectId, ref: 'Product' },
     amount: {
         type: Number
     },

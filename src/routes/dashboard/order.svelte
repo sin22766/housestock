@@ -34,7 +34,7 @@
         url: "/api/order",
         then: (data: any) =>
             data.map((item: any) => [
-                item.product.name,
+                item.product_name,
                 item.amount,
                 item.type,
                 item.createdAt,
@@ -61,26 +61,30 @@
     <title>Orders</title>
 </svelte:head>
 
-<h1>Orders</h1>
-<div class="position-relative">
-    <Grid bind:instance={grid} {columns} {server} sort={true} search={true}/>
-    <div class="position-absolute top-0 end-0">
-        <Button
-                color="primary"
-                on:click={toggleOrder}>Add Used
-        </Button>
-        <Button
-                color="primary"
-                on:click={toggleRestock}>Restock
-        </Button>
+<div>
+    <h1 class="d-inline">Orders</h1>
+    <div class="float-end">
+        <Button color="primary" on:click={toggleOrder}>Add Used</Button>
+        <Button color="primary" on:click={toggleRestock}>Restock</Button>
     </div>
 </div>
+<Grid bind:instance={grid} {columns} {server} sort={true} search={true} />
 
-<Modal header="Add used product" isOpen={openOrder} toggle={toggleOrder} fullscreen>
-    <iframe class="w-100 vh-100" src="/order" title="Orders Maker"></iframe>
+<Modal
+    header="Add used product"
+    isOpen={openOrder}
+    toggle={toggleOrder}
+    fullscreen
+>
+    <iframe class="w-100 vh-100" src="/order" title="Orders Maker" />
 </Modal>
-<Modal header="Add Restock product" isOpen={openRestock} toggle={toggleRestock} fullscreen>
-    <iframe class="w-100 vh-100" src="/restock" title="Orders Maker"></iframe>
+<Modal
+    header="Add Restock product"
+    isOpen={openRestock}
+    toggle={toggleRestock}
+    fullscreen
+>
+    <iframe class="w-100 vh-100" src="/restock" title="Orders Maker" />
 </Modal>
 
 <style>

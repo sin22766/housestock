@@ -1,6 +1,6 @@
 import type { RequestHandler } from "@sveltejs/kit";
 import dbConnect from "$lib/database/dbConnect";
-import { OrderModel, ProductModel, ResultOrderModel } from '$lib/database/dbModel'
+import { OrderModel, ProductModel } from '$lib/database/dbModel'
 import client from "$lib/line/lineClient";
 import mongoose from 'mongoose';
 
@@ -10,13 +10,11 @@ export const get: RequestHandler = async () => {
     await dbConnect();
     const orders = await OrderModel.aggregate().unwind("lists").project({
         "_id": 0,
-        "product": "$lists.product",
+        "product_name": "$lists.product_name",
         "amount": "$lists.amount",
         "type": "$lists.type",
         "createdAt": 1
     });
-
-    await ResultOrderModel.populate(orders, { path: 'product', select: 'name' });
 
     return {
         status: 200,
@@ -32,10 +30,12 @@ export const post: RequestHandler = async ({ request }) => {
     const orderList = payload.flatMap(item => {
         item.product = new Types.ObjectId(item.product_id);
         delete item.product_id;
-
         let curProduct = products.find(prod => prod._id.equals(item.product));
+
+        item.product_name = curProduct.name;
+
         if (curProduct.amount < item.amount) {
-            errorItem.push(curProduct.name);
+            errorItem.push(item.product_name);
             return [];
         }
 
@@ -43,13 +43,13 @@ export const post: RequestHandler = async ({ request }) => {
             if (curProduct.amount - item.amount < 10) {
                 client.broadcast({
                     type: 'text',
-                    text: `${curProduct.name} เหลือน้อยกว่า 10 ชิ้นแล้ว`,
+                    text: `${item.product_name} เหลือน้อยกว่า 10 ชิ้นแล้ว`,
                 })
             }
         } else if (curProduct.amount - item.amount === 0) {
             client.broadcast({
                 type: 'text',
-                text: `${curProduct.name} หมดแล้ว`,
+                text: `${item.product_name} หมดแล้ว`,
             })
         }
 

@@ -1,9 +1,17 @@
 <script lang="ts">
-    import {Col, Container, Row} from 'sveltestrap';
+    import { Container, Row, Col, Button } from "sveltestrap";
 </script>
 
-<Container class="m-4">
-    <h1>Welcome to SvelteKit</h1>
-    <p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
-</Container>
+<svelte:head>
+    <title>Index</title>
+</svelte:head>
 
+<Container
+    class="d-flex flex-column min-vh-100 justify-content-center align-items-center"
+>
+    <h1 class="text-center">Household Inventory Management</h1>
+    <p>
+        <Button href="/order" color="primary">Click Here!</Button> to Enter used
+        Item.
+    </p>
+</Container>
