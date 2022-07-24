@@ -1,10 +1,10 @@
-import type {RequestHandler} from "@sveltejs/kit";
+import type { RequestHandler } from "@sveltejs/kit";
 import dbConnect from "$lib/database/dbConnect";
-import {OrderModel, ProductModel, ResultOrderModel} from '$lib/database/dbModel'
+import { OrderModel, ProductModel, ResultOrderModel } from '$lib/database/dbModel'
 import client from "$lib/line/lineClient";
 import mongoose from 'mongoose';
 
-const {Types} = mongoose;
+const { Types } = mongoose;
 
 export const get: RequestHandler = async () => {
     await dbConnect();
@@ -16,7 +16,7 @@ export const get: RequestHandler = async () => {
         "createdAt": 1
     });
 
-    await ResultOrderModel.populate(orders, {path: 'product', select: 'name'});
+    await ResultOrderModel.populate(orders, { path: 'product', select: 'name' });
 
     return {
         status: 200,
@@ -24,7 +24,7 @@ export const get: RequestHandler = async () => {
     };
 }
 
-export const post: RequestHandler = async ({request}) => {
+export const post: RequestHandler = async ({ request }) => {
     await dbConnect();
     const payload: any[] = await request.json();
     let errorItem: string[] = [];
@@ -39,13 +39,18 @@ export const post: RequestHandler = async ({request}) => {
             return [];
         }
 
-        if (curProduct.amount >= 5) {
-            if (curProduct.amount - item.amount < 5) {
+        if (curProduct.amount >= 10) {
+            if (curProduct.amount - item.amount < 10) {
                 client.broadcast({
                     type: 'text',
-                    text: `${curProduct.name} เหลือน้อยกว่า 5 ชิ้นแล้ว`,
+                    text: `${curProduct.name} เหลือน้อยกว่า 10 ชิ้นแล้ว`,
                 })
             }
+        } else if (curProduct.amount - item.amount === 0) {
+            client.broadcast({
+                type: 'text',
+                text: `${curProduct.name} หมดแล้ว`,
+            })
         }
 
         return item;
@@ -54,7 +59,7 @@ export const post: RequestHandler = async ({request}) => {
     const depleteReport = (errorItem.length) ? errorItem.join(', ') + "is not enough." : "";
 
     try {
-        await OrderModel.create({lists: orderList});
+        await OrderModel.create({ lists: orderList });
 
         return {
             status: 201,
