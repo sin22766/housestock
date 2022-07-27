@@ -34,7 +34,7 @@ export const post: RequestHandler = async ({ request }) => {
 
         item.product_name = curProduct.name;
 
-        if (curProduct.amount < item.amount) {
+        if (!item.amount || curProduct.amount < item.amount) {
             errorItem.push(item.product_name);
             return [];
         }

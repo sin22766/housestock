@@ -143,6 +143,7 @@
                                 type="number"
                                 name="orderAmount"
                                 id="orderAmount"
+                                bind:value={selectedAmount}
                                 placeholder="0"
                                 min="1"
                                 required
