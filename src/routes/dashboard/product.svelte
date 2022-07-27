@@ -69,16 +69,13 @@
     <title>Products</title>
 </svelte:head>
 
-<h1>Products</h1>
-<div class="position-relative">
-    <Grid bind:instance={grid} {columns} {server} sort={true} search={true}/>
-    <Button
-            class="position-absolute top-0 end-0"
-            color="primary"
-            on:click={toggle}>Add
-    </Button
-    >
+<div>
+    <h1 class="d-inline">Products</h1>
+    <div class="float-end">
+        <Button color="primary" on:click={toggle}>Add</Button>
+    </div>
 </div>
+<Grid bind:instance={grid} {columns} {server} sort={true} search={true}/>
 
 <Modal isOpen={open} {toggle} scrollable centered>
     <ModalHeader {toggle}>Add new product</ModalHeader>

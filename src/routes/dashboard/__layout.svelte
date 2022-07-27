@@ -10,13 +10,13 @@
 
 <Container fluid>
     <Row>
-        <Col sm="auto" class="bg-light sticky-top p-0">
-            <div class="d-flex flex-sm-column flex-shrink-0">
+        <Col md="auto" class="bg-light sticky-top p-0">
+            <div class="d-flex flex-md-column flex-shrink-0">
                 <a id="navHome" href="/" class="d-block p-4 link-dark text-center text-decoration-none">
                     <Icon name="house-fill" class="fs-2"/>
                     <Tooltip class="d-none d-sm-block" placement="right" target="navHome">Home</Tooltip>
                 </a>
-                <Nav pills class="flex-sm-column mb-auto text-center ms-auto">
+                <Nav pills class="flex-md-column mb-auto text-center ms-auto">
                     <NavItem>
                         <NavLink active={activeTab === 'Dashboard'} on:click={() => activeTab = 'Dashboard'}
                                  class="p-4 border-bottom rounded-0" href="/dashboard" id="navDashboard">
@@ -42,10 +42,10 @@
                 </Nav>
             </div>
         </Col>
-        <div class="col-sm p-3 min-vh-100">
+        <Col sm class="p-3 min-vh-100">
             <!-- content -->
             <slot/>
-        </div>
+        </Col>
     </Row>
 </Container>
 
