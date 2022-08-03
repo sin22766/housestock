@@ -83,6 +83,7 @@
 
         if (req.ok) {
             restockItems = [];
+            console.log(await req.text())
         } else {
             alert("Restock orders failed to submit!");
         }

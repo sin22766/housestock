@@ -34,42 +34,49 @@ export const post: RequestHandler = async ({ request }) => {
 
         item.product_name = curProduct.name;
 
-        if (!item.amount || curProduct.amount < item.amount) {
-            errorItem.push(item.product_name);
-            return [];
-        }
+        if (item.type === "Used") {
+            if (!item.amount || curProduct.amount < item.amount) {
+                errorItem.push(item.product_name);
+                return [];
+            }
 
-        if (curProduct.amount >= 10) {
-            if (curProduct.amount - item.amount < 10) {
+            if (curProduct.amount >= 10) {
+                if (curProduct.amount - item.amount < 10) {
+                    client.broadcast({
+                        type: 'text',
+                        text: `${item.product_name} เหลือน้อยกว่า 10 ชิ้นแล้ว`,
+                    })
+                }
+            } else if (curProduct.amount - item.amount === 0) {
                 client.broadcast({
                     type: 'text',
-                    text: `${item.product_name} เหลือน้อยกว่า 10 ชิ้นแล้ว`,
+                    text: `${item.product_name} หมดแล้ว`,
                 })
             }
-        } else if (curProduct.amount - item.amount === 0) {
-            client.broadcast({
-                type: 'text',
-                text: `${item.product_name} หมดแล้ว`,
-            })
+        } else {
+            if (!item.amount) {
+                errorItem.push(item.product_name);
+                return [];
+            }
         }
 
         return item;
     });
 
-    const depleteReport = (errorItem.length) ? errorItem.join(', ') + "is not enough." : "";
+    let Report = (errorItem.length) ? errorItem.join(', ') + " is not enough." : "";
 
     try {
         await OrderModel.create({ lists: orderList });
 
         return {
             status: 201,
-            body: depleteReport
+            body: Report
         }
     } catch (err) {
         console.log(err);
         return {
             status: 400,
-            body: depleteReport
+            body: Report
         }
     }
 

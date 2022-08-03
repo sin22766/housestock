@@ -46,8 +46,8 @@ const ResultOrderSchema = new Schema({
 });
 
 const ResultOrderModel = mongoose.models.ResultOrderModel || model('ResultOrderModel', ResultOrderSchema);
-const ProductModel = mongoose.models.Product || model('Product', ProductSchema);
-const OrderModel = mongoose.models.Order || model('Order', OrderSchema);
+const ProductModel = mongoose.models.Product || model('Product', ProductSchema, 'Products');
+const OrderModel = mongoose.models.Order || model('Order', OrderSchema, 'Orders');
 
 export {
     ProductModel,

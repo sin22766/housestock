@@ -52,8 +52,8 @@
     <Row>
         {#if depletedList.length}
             {#each depletedList as item, i}
-                <Col xs="6" md="4" lg="3">
-                    <Card body>
+                <Col xs="12" sm="6" md="4" lg="3">
+                    <Card body class="my-2">
                         <FormGroup>
                             <Label for="orderItem{i}">Item</Label>
                             <Input
